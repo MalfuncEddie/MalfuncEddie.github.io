@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>AWX and execution/hop nodes, how hard can it be? // Malfunctioning Eddie&#39;s Ramblings</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.98.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Malfunctioning Eddie" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://malfunceddie.github.io/css/main.min.88e7083eff65effb7485b6e6f38d10afbec25093a6fac42d734ce9024d3defbd.css" />
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AWX and execution/hop nodes, how hard can it be?"/>
+<meta name="twitter:description" content="Intro and disclaimer With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS ins azure and ansible &ldquo;clients&rdquo; in my homelab). Yes I could fix the network but with with the release of ansible receptor I can just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be."/>
+
+    <meta property="og:title" content="AWX and execution/hop nodes, how hard can it be?" />
+<meta property="og:description" content="Intro and disclaimer With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS ins azure and ansible &ldquo;clients&rdquo; in my homelab). Yes I could fix the network but with with the release of ansible receptor I can just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://malfunceddie.github.io/posts/2022-05-03-awx-and-execution/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-03T17:00:34+02:00" />
+<meta property="article:modified_time" content="2022-05-03T17:00:34+02:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://malfunceddie.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="Malfunctioning Eddie" /></a>
+      <h1>Malfunctioning Eddie&#39;s Ramblings</h1>
+      <nav class="app-header-menu">
+          <a class="app-header-menu-item" href="/">Home</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/tags/">Tags</a>
+             - 
+          
+          <a class="app-header-menu-item" href="/about/">About</a>
+      </nav>
+      <p>Making sense through rambling</p>
+      <div class="app-header-social">
+        
+          <a href="https://github.com/MalfuncEddie" target="_blank" rel="noreferrer noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-github">
+  <title>Github</title>
+  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+</svg>
+          </a>
+        
+          <a href="https://twitter.com/MalfuncEddie" target="_blank" rel="noreferrer noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-twitter">
+  <title>Twitter</title>
+  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+</svg>
+          </a>
+        
+      </div>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">AWX and execution/hop nodes, how hard can it be?</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          May 3, 2022
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          3 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <h1 id="intro-and-disclaimer">Intro and disclaimer</h1>
+<p>With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS ins azure and ansible &ldquo;clients&rdquo; in my homelab). Yes I could fix the network but with with the release of ansible receptor I can just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be.</p>
+<p>Disclaimer 1: THESE RAMBELINGS ARE PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<p>Disclaimer 2: DO NOT USE IN PRODUCTION!
+Please buy red hat automation platform if you want a supported version.</p>
+<p>Still here? Let go on a technical adventure.</p>
+<h1 id="enviroment">Enviroment</h1>
+<pre tabindex="0"><code>AKS                                                                             Home lab
+┌────────────────────────────────────────────┐
+│                                            │
+│ ┌────────┐ ┌────────┐ ┌────────┐ ┌───────┐ │
+│ │awx-task│ │awx-web │ │awx-ee  │ │redis  │ │
+│ │        │ │        │ │        │ │       │ │
+│ │        │ │        │ │        │ │       │ │
+│ │        │ │        │ │        │ │       │ │
+│ └────────┘ └────────┘ └────────┘ └───────┘ │
+│                                            ├───────────────────────────────────────────┐
+│                                            │                                           ▼
+│                                            │                                    ┌──────────────┐
+│                                            │                                    │ Linux        │
+│                                            │                                    │              │
+│                                            │                                    │execution     │
+└────────────────────────────────────────────┘                                    │              │
+                                                                                  │ node         │
+                                                                                  └──────────────┘
+</code></pre><p>We got a running AWX in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
+<h1 id="how-i-think-it-should-work">How I think it should work</h1>
+<p>The backing project of the automation mesh as Red Hat calls it is a prject called ansible-receptor (<a href="https://github.com/ansible/receptor)">https://github.com/ansible/receptor)</a>. This allows you to build a mesh network that can execute certain &ldquo;work commands&rdquo; on receptor nodes in its mesh network.</p>
+<p>Awx workflow:</p>
+<ol>
+<li>Press launch</li>
+<li>AWX launches an internal k8s pod executes the playbook</li>
+</ol>
+<p>Awx workflow with receptor:</p>
+<ol>
+<li>Press launch</li>
+<li>Awx knows it should be executed not on k8s but on a execution node</li>
+<li>It sends by receptor network an ansible-runner command to the node</li>
+<li>Node launches a container that executes the playbook</li>
+</ol>
+<h1 id="translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</h1>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
