@@ -1,31 +1,21 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Malfunctioning Eddie&#39;s Ramblings</title>
+    <title>Malfunctioning Eddie&#39;s Rambelings</title>
     <link>https://malfunceddie.github.io/</link>
-    <description>Recent content on Malfunctioning Eddie&#39;s Ramblings</description>
+    <description>Recent content on Malfunctioning Eddie&#39;s Rambelings</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Tue, 03 May 2022 17:00:34 +0200</lastBuildDate><atom:link href="https://malfunceddie.github.io/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>AWX and execution/hop nodes, how hard can it be?</title>
-      <link>https://malfunceddie.github.io/posts/2022-05-03-awx-and-execution/</link>
-      <pubDate>Tue, 03 May 2022 17:00:34 +0200</pubDate>
-      
-      <guid>https://malfunceddie.github.io/posts/2022-05-03-awx-and-execution/</guid>
-      <description>Intro and disclaimer With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS ins azure and ansible &amp;ldquo;clients&amp;rdquo; in my homelab). Yes I could fix the network but with with the release of ansible receptor I can just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be.</description>
-    </item>
+    <lastBuildDate>Wed, 04 May 2022 13:18:45 +0100</lastBuildDate>
+    
+        <atom:link href="https://malfunceddie.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
-      <title></title>
-      <link>https://malfunceddie.github.io/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <title>AWX and execution/hop nodes, how hard can it be?</title>
+      <link>https://malfunceddie.github.io/article/awx-hop-nodes/</link>
+      <pubDate>Tue, 03 May 2022 17:00:34 +0200</pubDate>
       
-      <guid>https://malfunceddie.github.io/about/</guid>
-      <description>Hi,
-My name is Stefan Coussens (Malfunctioning Eddie (yes like the robot on Futurama (https://futurama.fandom.com/wiki/Malfunctioning_Eddie)). This blog is not a blog but more like unhinged rambelings in a quest to understand things.
-15 years Unix/linux admin and currently an ansible enthousiast.
-Blog hosted by github pages and made with hugo(m10c theme) .</description>
+      <guid>https://malfunceddie.github.io/article/awx-hop-nodes/</guid>
+      <description>Intro and disclaimer With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS ins azure and ansible &amp;ldquo;clients&amp;rdquo; in my homelab). Yes I could fix the network but with with the release of ansible receptor I can just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be.</description>
     </item>
     
   </channel>

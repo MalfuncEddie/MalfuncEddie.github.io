@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on Malfunctioning Eddie&#39;s Ramblings</title>
+    <title>Tags on Malfunctioning Eddie&#39;s Rambelings</title>
     <link>https://malfunceddie.github.io/tags/</link>
-    <description>Recent content in Tags on Malfunctioning Eddie&#39;s Ramblings</description>
+    <description>Recent content in Tags on Malfunctioning Eddie&#39;s Rambelings</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://malfunceddie.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 03 May 2022 17:00:34 +0200</lastBuildDate><atom:link href="https://malfunceddie.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ansible</title>
+      <link>https://malfunceddie.github.io/tags/ansible/</link>
+      <pubDate>Tue, 03 May 2022 17:00:34 +0200</pubDate>
+      
+      <guid>https://malfunceddie.github.io/tags/ansible/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AWX</title>
+      <link>https://malfunceddie.github.io/tags/awx/</link>
+      <pubDate>Tue, 03 May 2022 17:00:34 +0200</pubDate>
+      
+      <guid>https://malfunceddie.github.io/tags/awx/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>

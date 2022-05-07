@@ -2,22 +2,40 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://malfunceddie.github.io/posts/2022-05-03-awx-and-execution/</loc>
-    <lastmod>2022-05-03T17:00:34+02:00</lastmod>
+    <loc>https://malfunceddie.github.io/page/about/</loc>
+    <lastmod>2022-05-04T13:18:45+01:00</lastmod>
   </url><url>
     <loc>https://malfunceddie.github.io/</loc>
+    <lastmod>2022-05-04T13:18:45+01:00</lastmod>
+  </url><url>
+    <loc>https://malfunceddie.github.io/page/</loc>
+    <lastmod>2022-05-04T13:18:45+01:00</lastmod>
+  </url><url>
+    <loc>https://malfunceddie.github.io/tags/ansible/</loc>
     <lastmod>2022-05-03T17:00:34+02:00</lastmod>
   </url><url>
-    <loc>https://malfunceddie.github.io/posts/</loc>
+    <loc>https://malfunceddie.github.io/article/</loc>
     <lastmod>2022-05-03T17:00:34+02:00</lastmod>
   </url><url>
-    <loc>https://malfunceddie.github.io/about/</loc>
-    <priority>0</priority>
+    <loc>https://malfunceddie.github.io/author/</loc>
+    <lastmod>2022-05-03T17:00:34+02:00</lastmod>
   </url><url>
-    <loc>https://malfunceddie.github.io/categories/awx-ansible-execution/hop-nodes/</loc>
+    <loc>https://malfunceddie.github.io/tags/awx/</loc>
+    <lastmod>2022-05-03T17:00:34+02:00</lastmod>
+  </url><url>
+    <loc>https://malfunceddie.github.io/article/awx-hop-nodes/</loc>
+    <lastmod>2022-05-03T17:00:34+02:00</lastmod>
+  </url><url>
+    <loc>https://malfunceddie.github.io/author/malfuncedddie/</loc>
+    <lastmod>2022-05-03T17:00:34+02:00</lastmod>
+  </url><url>
+    <loc>https://malfunceddie.github.io/tags/</loc>
+    <lastmod>2022-05-03T17:00:34+02:00</lastmod>
+  </url><url>
+    <loc>https://malfunceddie.github.io/archive/</loc>
   </url><url>
     <loc>https://malfunceddie.github.io/categories/</loc>
   </url><url>
-    <loc>https://malfunceddie.github.io/tags/</loc>
+    <loc>https://malfunceddie.github.io/series/</loc>
   </url>
 </urlset>
