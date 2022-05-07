@@ -9,23 +9,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="siteBaseUrl" content="https://malfunceddie.github.io/">
     <meta name="author" content="MalfuncEddie">
-    <meta name="description" content="Malfunctioning Eddie&#39;s Rambelings">
+    <meta name="description" content="Malfunctioning Eddie&#39;s Ramblings">
     <meta name="keywords" content="blog,personal,technical,awx,ansible,vmware,xymon,netbox">
     <meta name="generator" content="Hugo 0.98.0" />
     <title>
         
            
-               AWX and execution/hop nodes, how hard can it be? &vert; Malfunctioning Eddie&#39;s Rambelings
+               AWX and execution/hop nodes, how hard can it be? &vert; Malfunctioning Eddie&#39;s Ramblings
            
         
     </title>
     <meta itemprop="name" content="AWX and execution/hop nodes, how hard can it be?">
-    <meta itemprop="description" content="AWX and execution/hop nodes, how hard can it be? - Malfunctioning Eddie&#39;s Rambelings">
+    <meta itemprop="description" content="AWX and execution/hop nodes, how hard can it be? - Malfunctioning Eddie&#39;s Ramblings">
     <meta property="og:title" content="AWX and execution/hop nodes, how hard can it be?">
-    <meta property="og:description" content="AWX and execution/hop nodes, how hard can it be? - Malfunctioning Eddie&#39;s Rambelings">
+    <meta property="og:description" content="AWX and execution/hop nodes, how hard can it be? - Malfunctioning Eddie&#39;s Ramblings">
     <meta property="og:image" content="https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?size=200">
     <meta property="og:url" content="https://malfunceddie.github.io/article/awx-hop-nodes/">
-    <meta property="og:site_name" content="Malfunctioning Eddie&#39;s Rambelings">
+    <meta property="og:site_name" content="Malfunctioning Eddie&#39;s Ramblings">
     <meta property="og:type" content="article">
 
     
@@ -34,8 +34,8 @@
     <script src="/modernizr-simple.js"></script>
 
     
-    <link href="/article/awx-hop-nodes/" rel="alternate" type="application/rss+xml" title="Malfunctioning Eddie&#39;s Rambelings" />
-    <link href="/article/awx-hop-nodes/" rel="feed" type="application/rss+xml" title="Malfunctioning Eddie&#39;s Rambelings" />
+    <link href="/article/awx-hop-nodes/" rel="alternate" type="application/rss+xml" title="Malfunctioning Eddie&#39;s Ramblings" />
+    <link href="/article/awx-hop-nodes/" rel="feed" type="application/rss+xml" title="Malfunctioning Eddie&#39;s Ramblings" />
     
 
     
@@ -54,10 +54,14 @@
 <body class="bilberry-hugo-theme">
 
     
-    <nav class="permanentTopNav">
+    <nav>
 
     <div class="container">
         <ul class="topnav">
+            
+                
+                    <li><a href="/article" target="_blank">Articles</a></li>
+                
             
                 
                     <li><a href="https://malfunceddie.github.io/page/about/">About</a></li>
@@ -86,19 +90,19 @@
         <div class="titles">
             <h3 class="title">
                 <a href="/">
-                    Malfunctioning Eddie&#39;s Rambelings
+                    Malfunctioning Eddie&#39;s Ramblings
                 </a>
             </h3>
 
             
-                <span class="subtitle">Trying to make sense through rambling</span>
+                <span class="subtitle">Trying to make sense through rambling?</span>
             
         </div>
 
         
 
         
-            <div class="toggler permanentTopNav">
+            <div class="toggler">
         
                 <i class="fa fa-bars" aria-hidden="true"></i>
             </div>
@@ -147,14 +151,24 @@
 
     
         
+            <h2>Table of Contents</h2>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#intro-and-disclaimer">Intro and disclaimer</a></li>
+    <li><a href="#enviroment">Enviroment</a></li>
+    <li><a href="#how-i-think-it-should-work">How I think it should work</a></li>
+    <li><a href="#translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</a></li>
+  </ul>
+</nav>
+        
 
-        <h1 id="intro-and-disclaimer">Intro and disclaimer</h1>
+        <h2 id="intro-and-disclaimer">Intro and disclaimer</h2>
 <p>With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS ins azure and ansible &ldquo;clients&rdquo; in my homelab). Yes I could fix the network but with with the release of ansible receptor I can just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be.</p>
 <p>Disclaimer 1: THESE RAMBELINGS ARE PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 <p>Disclaimer 2: DO NOT USE IN PRODUCTION!
 Please buy red hat automation platform if you want a supported version.</p>
 <p>Still here? Let go on a technical adventure.</p>
-<h1 id="enviroment">Enviroment</h1>
+<h2 id="enviroment">Enviroment</h2>
 <pre tabindex="0"><code>AKS                                                        Home lab
 ┌────────────────────────────────────────────┐
 │                                            │
@@ -174,7 +188,7 @@ Please buy red hat automation platform if you want a supported version.</p>
                                                            │ node         │
                                                            └──────────────┘
 </code></pre><p>We got a running AWX in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
-<h1 id="how-i-think-it-should-work">How I think it should work</h1>
+<h2 id="how-i-think-it-should-work">How I think it should work</h2>
 <p>The backing project of the automation mesh as Red Hat calls it is a prject called ansible-receptor (<strong><a href="https://github.com/ansible/receptor">receptor</a></strong>). This allows you to build a mesh network that can execute certain &ldquo;work commands&rdquo; on receptor nodes in its mesh network.</p>
 <p>Awx workflow:</p>
 <ol>
@@ -188,7 +202,8 @@ Please buy red hat automation platform if you want a supported version.</p>
 <li>It sends by receptor network an ansible-runner command to the node</li>
 <li>Node launches a container that executes the playbook</li>
 </ol>
-<h1 id="translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</h1>
+<h2 id="translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</h2>
+<p>tbc</p>
 
     
 </div>
@@ -271,6 +286,8 @@ Please buy red hat automation platform if you want a supported version.</p>
                 <a href="https://twitter.com/MalfuncEddie" target="_blank"><i class="fab fa-twitter"></i></a>
                 
                 <a href="https://github.com/MalfuncEddie/" target="_blank"><i class="fab fa-github"></i></a>
+                
+                <a href="https://www.linkedin.com/in/stefan-coussens-9230753" target="_blank"><i class="fab fa-linkedin"></i></a>
                 
             </div>
             
