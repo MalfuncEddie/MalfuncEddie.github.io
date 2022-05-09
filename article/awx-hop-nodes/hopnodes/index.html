@@ -154,7 +154,8 @@
             <h2>Table of Contents</h2>
             <nav id="TableOfContents">
   <ul>
-    <li><a href="#intro-and-disclaimer">Intro and disclaimer</a></li>
+    <li><a href="#intro">Intro</a></li>
+    <li><a href="#disclaimer">Disclaimer</a></li>
     <li><a href="#enviroment">Enviroment</a></li>
     <li><a href="#how-i-think-it-should-work">How I think it should work</a></li>
     <li><a href="#translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</a>
@@ -170,13 +171,17 @@
 </nav>
         
 
-        <h2 id="intro-and-disclaimer">Intro and disclaimer</h2>
+        <h2 id="intro">Intro</h2>
 <p>With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS in azure and ansible &ldquo;clients&rdquo; in my homelab). Yes I could fix the network but with with the release of ansible-receptor I should be able to just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be?</p>
-<p>Disclaimer 1: THESE RAMBELINGS ARE PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
-<p>Disclaimer 2: DO NOT USE IN PRODUCTION!
+<h2 id="disclaimer">Disclaimer</h2>
+<p>Disclaimer 1:</p>
+<p>THESE RAMBELINGS ARE PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<p>Disclaimer 2:</p>
+<p>DO NOT USE IN PRODUCTION!
 Please buy red hat automation platform if you want a supported version. This is more of a &ldquo;Can I run Doom on a printer&rdquo; project.</p>
 <p>Still here? Let go on a technical adventure!</p>
 <h2 id="enviroment">Enviroment</h2>
+<p>We got a running AWX in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
 <pre tabindex="0"><code>AKS                                                        Home lab
 ┌────────────────────────────────────────────┐
 │                                            │
@@ -195,8 +200,7 @@ Please buy red hat automation platform if you want a supported version. This is 
 └────────────────────────────────────────────┘             │              │
                                                            │ node         │
                                                            └──────────────┘
-</code></pre><p>We got a running AWX in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
-<p>Here is my aws manifest file(censored and secret missing)</p>
+</code></pre><p>Here is my aws manifest file(censored and secret missing)</p>
 <pre tabindex="0"><code>---
 apiVersion: awx.ansible.com/v1beta1
 kind: AWX
