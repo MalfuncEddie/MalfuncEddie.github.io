@@ -181,7 +181,7 @@
 Please buy red hat automation platform if you want a supported version. This is more of a &ldquo;Can I run Doom on a printer&rdquo; project.</p>
 <p>Still here? Let go on a technical adventure!</p>
 <h2 id="enviroment">Enviroment</h2>
-<p>We got a running AWX in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
+<p>We got a running AWX instance in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
 <pre tabindex="0"><code>AKS                                                        Home lab
 ┌────────────────────────────────────────────┐
 │                                            │
@@ -413,7 +413,7 @@ spec:
 <p>But what should the config look like?
 To answer this question we will look at the docker-compose dev version of AWX. <strong><a href="https://github.com/ansible/awx/tree/devel/tools/docker-compose">docker-compose version</a></strong>.</p>
 <p>In the <strong><a href="https://github.com/ansible/awx/tree/devel/tools/docker-compose/ansible/roles/sources/templates">template directory</a></strong> we can see three receptor configs.
-fumbling with some configs I think it should look like this (some secuity stuff disabled as this is a proof of concept):</p>
+Fumbling with some configs I think it should look like this (some security stuff disabled as this is a proof of concept):</p>
 <p>AWX node</p>
 <pre tabindex="0"><code>---
 - node:
@@ -509,7 +509,7 @@ from receptor-socket (rw)</p>
 from awx-receptor-config (ro)
 /var/run/receptor
 from receptor-socket (rw)</p>
-<p>When opening a console session and reviewing the supervisord config file I foud out that receptor is only running on the awx-ee container. I tought this would be in the task container but&hellip; okay :)</p>
+<p>When opening a console session and reviewing the supervisord config file I found out that receptor is only running on the awx-ee container. I tought this would be in the task container but &hellip; okay :)</p>
 <p>The awx operator allows you to have custom volume mounts <strong><a href="https://github.com/ansible/awx-operator#custom-volume-and-volume-mount-options">template directory</a></strong></p>
 <p>We add a config map:</p>
 <pre tabindex="0"><code>---
@@ -619,8 +619,7 @@ Node         Work Types
 receptor     ansible-runner
 axw-ee       local, kubernetes-runtime-auth, kubernetes-incluster-auth
 </code></pre><h3 id="are-we-there-yet">Are we there yet?</h3>
-<p>Short anwer: NO
-Long answer: NO</p>
+<p>Short and long answer: NO!</p>
 <p>Now we have a working receptor network, but we still have to let AWX know the peers exist. Revisiting <strong><a href="https://github.com/ansible/awx/tree/devel/tools/docker-compose">docker-compose version</a></strong> we find out some awx-mange commands do this.</p>
 <p>We log in to our awx-task container</p>
 <pre tabindex="0"><code>awx-manage register_queue --queuename=remote --instance_percent=100
