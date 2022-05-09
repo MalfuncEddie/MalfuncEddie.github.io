@@ -161,7 +161,7 @@
     <li><a href="#translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</a>
       <ul>
         <li><a href="#how-does-receptor-work">How does receptor work</a></li>
-        <li><a href="#changing-our-awx-install-on-k8s-and-taking-a-peek-at-the-development-docker-version-of-awx">Changing our AWX install on k8s and taking a peek at the development docker version of AWX</a></li>
+        <li><a href="#changing-the-awx-install-on-k8s-and-taking-a-peek-at-the-development-docker-version-of-awx">Changing the AWX install on k8s and taking a peek at the development docker version of AWX</a></li>
         <li><a href="#are-we-there-yet">Are we there yet?</a></li>
       </ul>
     </li>
@@ -393,7 +393,7 @@ VM1          control   Stream     2022-05-09 11:20:24   {&#39;type&#39;: &#39;Co
 VM2          control   Stream     2022-05-09 11:19:45   {&#39;type&#39;: &#39;Control Service&#39;}
 VM3          control   Stream     2022-05-09 11:19:45   {&#39;type&#39;: &#39;Control Service&#39;}
 </code></pre><p>Yeey we got connection from VM1 to VM3!</p>
-<h3 id="changing-our-awx-install-on-k8s-and-taking-a-peek-at-the-development-docker-version-of-awx">Changing our AWX install on k8s and taking a peek at the development docker version of AWX</h3>
+<h3 id="changing-the-awx-install-on-k8s-and-taking-a-peek-at-the-development-docker-version-of-awx">Changing the AWX install on k8s and taking a peek at the development docker version of AWX</h3>
 <p>Now that we know how receptor works we need to translate this configuration to awx/k8s.</p>
 <p>First thing that has to be done is to define an extra service that allows our execution node to make a connection to AWX on a given port. The receptor service on the execution node needs this access. It should look something like:</p>
 <pre tabindex="0"><code>apiVersion: v1
@@ -642,6 +642,7 @@ I got a job that is forever in the pending state. Analysing the logs I get the f
 </code></pre><p>It looks like the job is trying to run but cannot be scheduled on the control plane?</p>
 <h2 id="help-">Help !?</h2>
 <p>This is the part where I ask for help. I have no idea what I am missing.
+On the mailing list I did get a hint that &ldquo;You may need to look into the work-signing field in receptor configs.&rdquo;. So that will be the next thing I will look into.
 If I&rsquo;ll ever find out I will create a part 2 article where I solve this and also try to add some security options.</p>
 <p>If someone wants to contribute you can always comment below.</p>
 <p>PS: You can also always <strong><a href="https://www.buymeacoffee.com/MalfuncEddie">Buy me a coffee</a></strong></p>
