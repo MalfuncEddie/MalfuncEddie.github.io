@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+
+  
+<html itemscope itemtype="https://schema.org/WebPage" class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="siteBaseUrl" content="https://malfunceddie.github.io/">
+    <meta name="author" content="MalfuncEddie">
+    <meta name="description" content="Malfunctioning Eddie&#39;s Ramblings">
+    <meta name="keywords" content="blog,personal,technical,awx,ansible,vmware,xymon,netbox">
+    <meta name="generator" content="Hugo 0.98.0" />
+    <title>
+        
+           
+               AWX and execution/hop nodes, how hard can it be? - Part 1 &vert; Malfunctioning Eddie&#39;s Ramblings
+           
+        
+    </title>
+    <meta itemprop="name" content="AWX and execution/hop nodes, how hard can it be? - Part 1">
+    <meta itemprop="description" content="AWX and execution/hop nodes, how hard can it be? - Part 1 - Malfunctioning Eddie&#39;s Ramblings">
+    <meta property="og:title" content="AWX and execution/hop nodes, how hard can it be? - Part 1">
+    <meta property="og:description" content="AWX and execution/hop nodes, how hard can it be? - Part 1 - Malfunctioning Eddie&#39;s Ramblings">
+    <meta property="og:image" content="https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?size=200">
+    <meta property="og:url" content="https://malfunceddie.github.io/article/awx-hop-nodes/hopnodes/">
+    <meta property="og:site_name" content="Malfunctioning Eddie&#39;s Ramblings">
+    <meta property="og:type" content="article">
+
+    
+
+
+    <script src="/modernizr-simple.js"></script>
+
+    
+    <link href="/article/awx-hop-nodes/hopnodes/" rel="alternate" type="application/rss+xml" title="Malfunctioning Eddie&#39;s Ramblings" />
+    <link href="/article/awx-hop-nodes/hopnodes/" rel="feed" type="application/rss+xml" title="Malfunctioning Eddie&#39;s Ramblings" />
+    
+
+    
+    <link rel="canonical" href="https://malfunceddie.github.io/article/awx-hop-nodes/hopnodes/">
+    
+
+    <link rel="stylesheet" href="https://malfunceddie.github.io/theme.css">
+
+    
+
+    
+        
+    
+</head>
+
+<body class="bilberry-hugo-theme">
+
+    
+    <nav>
+
+    <div class="container">
+        <ul class="topnav">
+            
+                
+                    <li><a href="/article" target="_blank">Articles</a></li>
+                
+            
+                
+                    <li><a href="https://malfunceddie.github.io/page/about/">About</a></li>
+                
+            
+        </ul>
+
+        
+    </div>
+</nav>
+
+
+    
+    <header>
+
+    <div class="container">
+        <div class="logo">
+            <a href="/" class="logo">
+                
+                    <img src="/ava.gif" alt="">
+                
+
+                <span class="overlay"><i class="fa fa-home"></i></span>
+            </a>
+        </div>
+        <div class="titles">
+            <h3 class="title">
+                <a href="/">
+                    Malfunctioning Eddie&#39;s Ramblings
+                </a>
+            </h3>
+
+            
+                <span class="subtitle">Trying to make sense through rambling?</span>
+            
+        </div>
+
+        
+
+        
+            <div class="toggler">
+        
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </div>
+    </div>
+</header>
+
+
+    <div class="main container">
+        
+    <div class="article-wrapper u-cf single">
+        
+            <a class="bubble" href="https://malfunceddie.github.io/article/awx-hop-nodes/hopnodes/">
+    <i class="fas fa-fw fa-pencil-alt"></i>
+</a>
+
+<article class="default article">
+    
+
+    <div class="content">
+    <h1 class="article-title">
+        <a href="https://malfunceddie.github.io/article/awx-hop-nodes/hopnodes/">
+            AWX and execution/hop nodes, how hard can it be? - Part 1
+        </a>
+    </h1>
+
+    <div class="meta">
+        
+            
+                <span class="date moment">2022-05-03</span>
+            
+        
+
+        
+
+        
+
+        
+            <span class="author">
+                
+                
+                    <a href="https://malfunceddie.github.io/author/malfuncedddie/">MalfuncEdddie</a>
+                
+            </span>
+        
+    </div>
+
+    
+        
+            <h2>Table of Contents</h2>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#intro-and-disclaimer">Intro and disclaimer</a></li>
+    <li><a href="#enviroment">Enviroment</a></li>
+    <li><a href="#how-i-think-it-should-work">How I think it should work</a></li>
+    <li><a href="#translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</a>
+      <ul>
+        <li><a href="#how-does-receptor-work">How does receptor work</a></li>
+        <li><a href="#changing-our-awx-install-on-k8s-and-taking-a-peek-at-the-development-docker-version-of-awx">Changing our AWX install on k8s and taking a peek at the development docker version of AWX</a></li>
+        <li><a href="#are-we-there-yet">Are we there yet?</a></li>
+      </ul>
+    </li>
+    <li><a href="#failure">Failure</a></li>
+    <li><a href="#help-">Help !?</a></li>
+  </ul>
+</nav>
+        
+
+        <h2 id="intro-and-disclaimer">Intro and disclaimer</h2>
+<p>With the migration of AWX to k8s (with the awx-operator) I kind of gotten stuck because I lost some connectivity to my test enviroment (AKS in azure and ansible &ldquo;clients&rdquo; in my homelab). Yes I could fix the network but with with the release of ansible-receptor I should be able to just deploy a execution node in my homelab and execute everything from the execution node. How hard can it be?</p>
+<p>Disclaimer 1: THESE RAMBELINGS ARE PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<p>Disclaimer 2: DO NOT USE IN PRODUCTION!
+Please buy red hat automation platform if you want a supported version. This is more of a &ldquo;Can I run Doom on a printer&rdquo; project.</p>
+<p>Still here? Let go on a technical adventure!</p>
+<h2 id="enviroment">Enviroment</h2>
+<pre tabindex="0"><code>AKS                                                        Home lab
+┌────────────────────────────────────────────┐
+│                                            │
+│ ┌────────┐ ┌────────┐ ┌────────┐ ┌───────┐ │
+│ │awx-task│ │awx-web │ │awx-ee  │ │redis  │ │
+│ │        │ │        │ │        │ │       │ │
+│ │        │ │        │ │        │ │       │ │
+│ │        │ │        │ │        │ │       │ │
+│ └────────┘ └────────┘ └────────┘ └───────┘ │
+│                                            ├────────────────────┐
+│                                            │                    ▼
+│                                            │             ┌──────────────┐
+│                                            │             │ Linux        │
+│                                            │             │              │
+│                                            │             │execution     │
+└────────────────────────────────────────────┘             │              │
+                                                           │ node         │
+                                                           └──────────────┘
+</code></pre><p>We got a running AWX in k8s installed with the awx-operator. In my home lab I got a linux server that will (hopefully) act as execution node.</p>
+<p>Here is my aws manifest file(censored and secret missing)</p>
+<pre tabindex="0"><code>---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+  namespace: awx
+spec:
+  postgres_configuration_secret: awx-postgres-configuration
+  secret_key_secret: awx-secret-key
+  service_type: LoadBalancer
+  loadbalancer_protocol: http
+  loadbalancer_port: 80
+  service_labels: |
+    service.beta.kubernetes.io/azure-load-balancer-internal: &#34;true&#34;
+  service_annotations: |
+    service.beta.kubernetes.io/azure-load-balancer-internal: &#34;true&#34;
+  admin_user: admin
+  admin_email: ****
+</code></pre><h2 id="how-i-think-it-should-work">How I think it should work</h2>
+<p>The backing project of the automation mesh as Red Hat calls it is a prject called ansible-receptor (<strong><a href="https://github.com/ansible/receptor">receptor</a></strong>). This allows you to build a mesh network that can execute certain &ldquo;work commands&rdquo; on receptor nodes in its mesh network.</p>
+<p>Awx workflow:</p>
+<ol>
+<li>Press launch.</li>
+<li>AWX launches an internal k8s pod executes the playbook.</li>
+</ol>
+<p>Awx workflow with receptor:</p>
+<ol>
+<li>Press launch.</li>
+<li>Awx knows it should be executed not on k8s but on a execution node.</li>
+<li>It sends by receptor network an ansible-runner command to the node.</li>
+<li>Node launches a container that executes the playbook.</li>
+</ol>
+<h2 id="translating-how-i-think-it-works-to-lets-make-this-work">Translating &ldquo;How I think it works&rdquo; to &ldquo;Lets make this work&rdquo;</h2>
+<p>First thing we need to do is get a working understanding of how receptor works. If we can setup a receptor network as a test we know we got a working connection.</p>
+<h3 id="how-does-receptor-work">How does receptor work</h3>
+<p>Receptor is a service that can be a listener or a connector (or both). It has multiple security options like tls, signed work and firewall rules.
+Receptor has a &ldquo;work-command&rdquo; section that describes what you can execute on a node. This will be the ansible-runner command.
+More info on <strong><a href="https://github.com/ansible/receptor">receptor</a></strong>.</p>
+<p>To keep it easy we will setup a receptor network without any security stuff.</p>
+<pre tabindex="0"><code>┌───────────┐                        ┌──────────┐
+│vm1        │                        │ vm2      │
+│           │                        │          │
+│listener   │                        │ listener │
+│2222       │                        │ 2223     │
+│           ├────────────────────────►          │
+│           │                        │          │
+│           │                        │          │
+└───────────┘                        └───┬──────┘
+                                         │
+                                         │
+                                         │
+                                         │
+                                    ┌────▼─────┐
+                                    │ vm3      │
+                                    │          │
+                                    │ connect  │
+                                    │ vm2 2223 │
+                                    │          │
+                                    │          │
+                                    │          │
+                                    └──────────┘
+</code></pre><p>VM1 listens on 2222
+VM2 connects to VM1 on port 2222 and listens on 2223
+VM3 connects to VM2 on port 2223 (has no direct link to VM1)</p>
+<p>receptor.conf of VM1</p>
+<pre tabindex="0"><code>---
+- node:
+    id: VM1
+
+- log-level: info
+
+- control-service:
+    service: control
+    filename: /var/run/receptor/receptor.sock
+    permissions: 0660
+
+- tcp-listener:
+    port: 2222
+
+- tcp-peer:
+    address: VM2:2223
+    redial: true
+</code></pre><p>receptor.conf of VM2</p>
+<pre tabindex="0"><code>---
+- node:
+    id: VM2
+
+- log-level: info
+
+- control-service:
+    service: control
+    filename: /var/run/receptor/receptor.sock
+    permissions: 0660
+
+- tcp-listener:
+    port: 2223
+</code></pre><p>receptor.conf of VM3</p>
+<pre tabindex="0"><code>---
+- node:
+    id: VM3
+
+- log-level: info
+
+- control-service:
+    service: control
+    filename: /var/run/receptor/receptor.sock
+    permissions: 0660
+
+- tcp-peer:
+    address: VM2:2223
+    redial: true
+</code></pre><p>Start receptor on the VM&rsquo;s
+VM1</p>
+<pre tabindex="0"><code>INFO 2022/05/09 11:17:40 Running control service control
+INFO 2022/05/09 11:17:40 Initialization complete
+WARNING 2022/05/09 11:17:40 Backend connection failed (will retry): dial tcp 172.31.222.229:2223: connect: connection refused
+INFO 2022/05/09 11:17:45 Connection established with VM2
+INFO 2022/05/09 11:17:45 Known Connections:
+INFO 2022/05/09 11:17:45    VM1: VM2(1.00)
+INFO 2022/05/09 11:17:45    VM2: VM1(1.00) VM3(1.00)
+INFO 2022/05/09 11:17:45 Routing Table:
+INFO 2022/05/09 11:17:45    VM2 via VM2
+INFO 2022/05/09 11:17:45 Known Connections:
+INFO 2022/05/09 11:17:45    VM1: VM2(1.00)
+INFO 2022/05/09 11:17:45    VM2: VM1(1.00) VM3(1.00)
+INFO 2022/05/09 11:17:45    VM3: VM2(1.00)
+INFO 2022/05/09 11:17:45 Routing Table:
+INFO 2022/05/09 11:17:45    VM3 via VM2
+INFO 2022/05/09 11:17:45    VM2 via VM2
+</code></pre><p>VM2</p>
+<pre tabindex="0"><code>INFO 2022/05/09 11:17:40 Running control service control
+INFO 2022/05/09 11:17:40 Initialization complete
+INFO 2022/05/09 11:17:45 Connection established with VM1
+INFO 2022/05/09 11:17:45 Connection established with VM3
+INFO 2022/05/09 11:17:45 Known Connections:
+INFO 2022/05/09 11:17:45    VM2: VM1(1.00) VM3(1.00)
+INFO 2022/05/09 11:17:45    VM1: VM2(1.00)
+INFO 2022/05/09 11:17:45    VM3: VM2(1.00)
+INFO 2022/05/09 11:17:45 Routing Table:
+INFO 2022/05/09 11:17:45    VM1 via VM1
+INFO 2022/05/09 11:17:45    VM3 via VM3
+</code></pre><p>VM3</p>
+<pre tabindex="0"><code>INFO 2022/05/09 11:17:40 Running control service control
+INFO 2022/05/09 11:17:40 Initialization complete
+WARNING 2022/05/09 11:17:40 Backend connection failed (will retry): dial tcp 172.31.222.229:2223: connect: connection refused
+INFO 2022/05/09 11:17:45 Connection established with VM2
+INFO 2022/05/09 11:17:45 Known Connections:
+INFO 2022/05/09 11:17:45    VM3: VM2(1.00)
+INFO 2022/05/09 11:17:45    VM2: VM1(1.00) VM3(1.00)
+INFO 2022/05/09 11:17:45    VM1: VM2(1.00)
+INFO 2022/05/09 11:17:45 Routing Table:
+INFO 2022/05/09 11:17:45    VM1 via VM2
+INFO 2022/05/09 11:17:45    VM2 via VM2
+</code></pre><p>Use receptorctl on VM1 to the others</p>
+<pre tabindex="0"><code>#receptorctl --socket /var/run/receptor/receptor.sock ping VM3
+Warning: receptorctl and receptor are different versions, they may not be compatible
+Reply from VM3 in 1.233213ms
+Reply from VM3 in 1.253816ms
+^C
+# receptorctl --socket /var/run/receptor/receptor.sock ping VM2
+Warning: receptorctl and receptor are different versions, they may not be compatible
+Reply from VM2 in 487.912µs
+Reply from VM2 in 406.554µs
+^C
+# receptorctl --socket /var/run/receptor/receptor.sock ping VM1
+Warning: receptorctl and receptor are different versions, they may not be compatible
+Reply from VM1 in 32.88µs
+Reply from VM1 in 45.395µs
+# receptorctl --socket /var/run/receptor/receptor.sock status
+Warning: receptorctl and receptor are different versions, they may not be compatible
+Node ID: VM1
+Version: 1.1.1
+System CPU Count: 1
+System Memory MiB: 3935
+
+Connection   Cost
+VM2          1
+
+Known Node   Known Connections
+VM1          VM2: 1
+VM2          VM1: 1 VM3: 1
+VM3          VM2: 1
+
+Route        Via
+VM2          VM2
+VM3          VM2
+
+Node         Service   Type       Last Seen             Tags
+VM1          control   Stream     2022-05-09 11:20:24   {&#39;type&#39;: &#39;Control Service&#39;}
+VM2          control   Stream     2022-05-09 11:19:45   {&#39;type&#39;: &#39;Control Service&#39;}
+VM3          control   Stream     2022-05-09 11:19:45   {&#39;type&#39;: &#39;Control Service&#39;}
+</code></pre><p>Yeey we got connection from VM1 to VM3!</p>
+<h3 id="changing-our-awx-install-on-k8s-and-taking-a-peek-at-the-development-docker-version-of-awx">Changing our AWX install on k8s and taking a peek at the development docker version of AWX</h3>
+<p>Now that we know how receptor works we need to translate this configuration to awx/k8s.</p>
+<p>First thing that has to be done is to define an extra service that allows our execution node to make a connection to AWX on a given port. The receptor service on the execution node needs this access. It should look something like:</p>
+<pre tabindex="0"><code>apiVersion: v1
+kind: Service
+metadata:
+  name: receptor
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: &#34;true&#34;
+spec:
+  selector:
+    app.kubernetes.io/component: awx
+  ports:
+    - port: 6996
+      targetPort: 6996
+  type: LoadBalancer
+</code></pre><p>This creates a service and you can connect on it using port 6996.</p>
+<p>But what should the config look like?
+To answer this question we will look at the docker-compose dev version of AWX. <strong><a href="https://github.com/ansible/awx/tree/devel/tools/docker-compose">docker-compose version</a></strong>.</p>
+<p>In the <strong><a href="https://github.com/ansible/awx/tree/devel/tools/docker-compose/ansible/roles/sources/templates">template directory</a></strong> we can see three receptor configs.
+fumbling with some configs I think it should look like this (some secuity stuff disabled as this is a proof of concept):</p>
+<p>AWX node</p>
+<pre tabindex="0"><code>---
+- node:
+    id: awx-ee
+    #firewallrules:
+    #  - action: &#34;reject&#34;
+    #    tonode: awx_{{ item }}
+    #    toservice: &#34;control&#34;
+
+- log-level: info
+
+- tcp-listener:
+    port: 6996
+
+#- work-signing:
+#    privatekey: /etc/receptor/work_private_key.pem
+#    tokenexpiration: 1m
+
+#- work-verification:
+#    publickey: /etc/receptor/work_public_key.pem
+
+
+#- tls-server:
+#    name: mutual-tls
+#    cert: /etc/receptor/certs/awx.crt
+#    key: /etc/receptor/certs/awx.key
+#    requireclientcert: true
+#    clientcas: /etc/receptor/certs/ca.crt
+
+- control-service:
+    service: control
+    filename: /var/run/receptor/receptor.sock
+
+- work-command:
+    worktype: local
+    command: ansible-runner
+    params: worker
+    allowruntimeparams: true
+    verifysignature: true
+
+- work-kubernetes:
+    worktype: kubernetes-runtime-auth
+    authmethod: runtime
+    allowruntimeauth: true
+    allowruntimepod: true
+    allowruntimeparams: true
+    verifysignature: true
+
+- work-kubernetes:
+    worktype: kubernetes-incluster-auth
+    authmethod: incluster
+    allowruntimeauth: true
+    allowruntimepod: true
+    allowruntimeparams: true
+    verifysignature: true
+</code></pre><p>Work node (hostname recptor)</p>
+<pre tabindex="0"><code>---
+- node:
+    id: receptor
+
+- log-level: info
+
+- tcp-peer:
+    address: &lt;IP from azure LB&gt;:6996
+    redial: true
+
+#- work-verification:
+#    publickey: /etc/receptor/work_public_key.pem
+
+- work-command:
+    worktype: ansible-runner
+    command: ansible-runner
+    params: worker
+    allowruntimeparams: true
+    verifysignature: true
+
+- control-service:
+    service: control
+    filename: /var/run/receptor/receptor.sock
+</code></pre><p>On the AWX pod there are 4 containers. If I look at the mounts of each container there are 2 containers that some receptor mounts.</p>
+<ol>
+<li>awx-task has</li>
+</ol>
+<p>/etc/receptor/receptor.conf
+from awx-receptor-config (ro)
+/var/run/receptor
+from receptor-socket (rw)</p>
+<p>and</p>
+<ol start="2">
+<li>awx-ee</li>
+</ol>
+<p>/etc/receptor/receptor.conf
+from awx-receptor-config (ro)
+/var/run/receptor
+from receptor-socket (rw)</p>
+<p>When opening a console session and reviewing the supervisord config file I foud out that receptor is only running on the awx-ee container. I tought this would be in the task container but&hellip; okay :)</p>
+<p>The awx operator allows you to have custom volume mounts <strong><a href="https://github.com/ansible/awx-operator#custom-volume-and-volume-mount-options">template directory</a></strong></p>
+<p>We add a config map:</p>
+<pre tabindex="0"><code>---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: receptor-ee-extra-config
+  namespace: awx
+data:
+
+  receptor.conf: |
+    ---
+    - node:
+        id: axw-ee
+
+    - log-level: info
+
+    - control-service:
+        service: control
+        filename: /var/run/receptor/receptor.sock
+        permissions: 0660
+        #tls: tls_server
+
+
+    # Listener
+    - tcp-listener:
+        port: 6996
+
+    - local-only:
+
+    - work-command:
+        worktype: local
+        command: ansible-runner
+        params: worker
+        allowruntimeparams: true
+
+    - work-kubernetes:
+        worktype: kubernetes-runtime-auth
+        authmethod: runtime
+        allowruntimeauth: true
+        allowruntimepod: true
+        allowruntimeparams: true
+
+    - work-kubernetes:
+        worktype: kubernetes-incluster-auth
+        authmethod: incluster
+        allowruntimeauth: true
+        allowruntimepod: true
+        allowruntimeparams: true
+</code></pre><p>kubectl apply -f &hellip;. -n awx</p>
+<p>We edit the &ldquo;main awx.yml&rdquo;</p>
+<pre tabindex="0"><code>---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+  namespace: awx
+spec:
+  postgres_configuration_secret: awx-postgres-configuration
+  secret_key_secret: awx-secret-key
+  service_type: LoadBalancer
+  loadbalancer_protocol: http
+  loadbalancer_port: 80
+  service_labels: |
+    service.beta.kubernetes.io/azure-load-balancer-internal: &#34;true&#34;
+  service_annotations: |
+    service.beta.kubernetes.io/azure-load-balancer-internal: &#34;true&#34;
+  admin_user: admin
+  admin_email: ****
+  extra_volumes: |
+    - name: receptor-cfg-ee
+      configMap:
+        defaultMode: 420
+        items:
+          - key: receptor.conf
+            path: receptor.conf
+        name: receptor-ee-extra-config
+  ee_extra_volume_mounts: |
+    - name: receptor-cfg-ee
+      mountPath: /etc/receptor/receptor.conf
+      subPath: receptor.conf
+</code></pre><p>kubectl apply -f &hellip;. -n awx</p>
+<p>Do not forget to have the receptor service running on the home lab server.</p>
+<p>And behold!</p>
+<pre tabindex="0"><code># receptorctl  --socket /var/run/receptor/receptor.sock status
+Warning: receptorctl and receptor are different versions, they may not be compatible
+Node ID: receptor
+Version: +g
+System CPU Count: 1
+System Memory MiB: 3935
+
+Connection   Cost
+axw-ee       1
+
+Known Node   Known Connections
+axw-ee       receptor: 1
+receptor     axw-ee: 1
+
+Route        Via
+axw-ee       axw-ee
+
+Node         Service   Type       Last Seen             Tags
+receptor     control   Stream     2022-05-09 12:26:03   {&#39;type&#39;: &#39;Control Service&#39;}
+axw-ee       control   Stream     2022-05-09 10:25:57   {&#39;type&#39;: &#39;Control Service&#39;}
+
+Node         Work Types
+receptor     ansible-runner
+axw-ee       local, kubernetes-runtime-auth, kubernetes-incluster-auth
+</code></pre><h3 id="are-we-there-yet">Are we there yet?</h3>
+<p>Short anwer: NO
+Long answer: NO</p>
+<p>Now we have a working receptor network, but we still have to let AWX know the peers exist. Revisiting <strong><a href="https://github.com/ansible/awx/tree/devel/tools/docker-compose">docker-compose version</a></strong> we find out some awx-mange commands do this.</p>
+<p>We log in to our awx-task container</p>
+<pre tabindex="0"><code>awx-manage register_queue --queuename=remote --instance_percent=100
+awx-manage provision_instance --hostname=&#34;receptor&#34; --node_type=&#34;execution&#34;
+awx-manage register_peers axw-UID --peers &#34;receptor&#34;
+</code></pre><p>First command creates a new instance group
+Second command provisions the instance
+Third command generates a linkg beween the awx pod an my execution node. (I still have to find out how to give the awx pod in recpator a fixed name)</p>
+<p>(I do think I also needed to associate the instance with the group)</p>
+<p>And behold!</p>
+<p><img src="topv.png" alt="alt text" title="topology view">
+<img src="inst.png" alt="alt text" title="instance view"></p>
+<p>However&hellip;.</p>
+<h2 id="failure">Failure</h2>
+<p>At this point I tought I had it all figured out. The AWX gui showed a good topology and everything was registered. However when testing this out by changing an inventory to use the remote instance group &ndash;&gt; PENDING.
+I got a job that is forever in the pending state. Analysing the logs I get the following lines.</p>
+<pre tabindex="0"><code>2022-05-09 11:26:56,350 DEBUG [d9b720fce0da479f841a103cb94a3aef] awx.main.scheduler ad_hoc_command 14282 (pending) couldn&#39;t be scheduled on graph, waiting for next cycle
+2022-05-09 11:26:56,350 DEBUG [d9b720fce0da479f841a103cb94a3aef] awx.main.scheduler Skipping task ad_hoc_command 14282 (pending) in pending, not enough capacity left on controlplane to control new tasks
+2022-05-09 11:26:56,350 DEBUG [d9b720fce0da479f841a103cb94a3aef] awx.main.scheduler Finishing Scheduler
+</code></pre><p>It looks like the job is trying to run but cannot be scheduled on the control plane?</p>
+<h2 id="help-">Help !?</h2>
+<p>This is the part where I ask for help. I have no idea what I am missing.
+If I&rsquo;ll ever find out I will create a part 2 article where I solve this and also try to add some security options.</p>
+<p>If someone wants to contribute you can always comment below.</p>
+<p>PS: You can also always <strong><a href="https://www.buymeacoffee.com/MalfuncEddie">Buy me a coffee</a></strong></p>
+
+    
+</div>
+
+    
+<div class="footer">
+
+
+    
+        <div class="tags">
+            <i class="fa fa-tags"></i>
+            <div class="links">
+                
+                    
+                    
+                    <a href="https://malfunceddie.github.io/tags/awx/">AWX</a>
+                    
+                
+                    
+                    
+                    <a href="https://malfunceddie.github.io/tags/ansible/">ansible</a>
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+</article>
+
+        
+    </div>
+
+    
+        <div id="comments-container">
+            
+            
+
+            
+    <script src="https://giscus.app/client.js"
+        data-repo="MalfuncEddie/MalfuncEddie.github.io"
+        data-repo-id="R_kgDOHRoesw"
+        data-category="General"
+        data-category-id="DIC_kwDOHRoes84CO-t1"
+        data-mapping="pathname"
+        data-reactions-enabled="1"
+        data-emit-metadata=""
+        data-theme="light"
+        
+            data-lang="en"
+        
+        crossorigin="anonymous"
+        async>
+    </script>
+    <div id="giscus"></div>
+
+
+            
+
+        </div>
+    
+
+    </div>
+
+    
+<footer>
+    <div class="container">
+
+        
+        <div class="recent-posts">
+            <strong>Latest posts</strong>
+            <ul>
+                
+                
+                    <li>
+                        <a href="https://malfunceddie.github.io/article/awx-hop-nodes/hopnodes/">AWX and execution/hop nodes, how hard can it be? - Part 1</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://malfunceddie.github.io/archive/">Archive page</a>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        
+
+        <div class="right">
+            
+            <div class="external-profiles">
+                <strong>Social media</strong>
+
+                
+                <a href="https://twitter.com/MalfuncEddie" target="_blank"><i class="fab fa-twitter"></i></a>
+                
+                <a href="https://github.com/MalfuncEddie/" target="_blank"><i class="fab fa-github"></i></a>
+                
+                <a href="https://www.linkedin.com/in/stefan-coussens-9230753" target="_blank"><i class="fab fa-linkedin"></i></a>
+                
+                <a href="https://www.buymeacoffee.com/MalfuncEddie" target="_blank"><i class="fab fa-coffee"></i></a>
+                
+            </div>
+            
+
+            
+
+            
+        </div>
+    </div>
+</footer>
+
+
+<div class="credits">
+    <div class="container">
+        <div class="copyright">
+            <a href="https://github.com/MalfuncEddie/" target="_blank">
+                &copy;
+                
+                2022
+                
+                by MalfuncEddie
+            </a>
+            
+        </div>
+        <div class="author">
+            <a href="https://github.com/Lednerb/bilberry-hugo-theme"
+                target="_blank">Bilberry Hugo Theme</a>
+        </div>
+    </div>
+</div>
+
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8RV9XSX50S"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-8RV9XSX50S', { 'anonymize_ip': false });
+}
+</script>
+
+
+    
+
+
+    <script src="https://malfunceddie.github.io/theme.js"></script>
+
+    
+    
+    
+
+    
+</body>
+
+</html>
